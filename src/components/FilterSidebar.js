@@ -17,6 +17,7 @@ export default function FilterSidebar({
     const [selectedThemes, setSelectedThemes] = useState([]);
     const [selectedActivities, setSelectedActivities] = useState([]);
     const [selectedVehicles, setSelectedVehicles] = useState([]);
+    const [selectedFeatures, setSelectedFeatures] = useState([]);
 
     const handleReset = () => {
         setSelectedCategory('all');
@@ -33,6 +34,7 @@ export default function FilterSidebar({
             themes: selectedThemes,
             activities: selectedActivities,
             vehicles: selectedVehicles,
+            features: selectedFeatures
         });
         if (isMobile && onClose) onClose();
     };
@@ -140,6 +142,12 @@ export default function FilterSidebar({
                         items={filters.vehicle}
                         selectedItems={selectedVehicles}
                         onToggle={setSelectedVehicles}
+                    />
+                    <FilterSection
+                        title="Features"
+                        items={filters.features}
+                        selectedItems={selectedFeatures}
+                        onToggle={setSelectedFeatures}
                     />
 
                     <div className="flex gap-4 pt-6">

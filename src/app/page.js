@@ -11,7 +11,7 @@ export default function Home() {
   const [filteredTours, setFilteredTours] = useState(tours);
 
   const handleFilterApply = (filters) => {
-    const { category, priceRange, themes, activities, vehicles } = filters;
+    const { category, priceRange, themes, activities, vehicles, features } = filters;
 
     const filtered = tours.filter(tour => {
       const categoryMatch = category === 'all' || tour.category === category;
@@ -19,10 +19,11 @@ export default function Home() {
       const activityMatch = activities.length === 0 ||
         activities.some(act => tour.activity.includes(act));
       const vehicleMatch = vehicles.length === 0 || vehicles.includes(tour.vehicle);
+      const featuresMatch = features.length === 0 || features.every(feat => tour.features.includes(feat));
       const priceMatch = tour.discountedPrice >= priceRange[0] &&
         tour.discountedPrice <= priceRange[1];
 
-      return categoryMatch && themeMatch && activityMatch && vehicleMatch && priceMatch;
+      return categoryMatch && themeMatch && activityMatch && vehicleMatch && priceMatch && featuresMatch;
     });
 
     setFilteredTours(filtered);
