@@ -5,14 +5,11 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  --primary-400: #f2a945;
+  --primary-500: #f78410;
+  --primary-600: #e07516;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
 
 body {
   color: var(--foreground);
