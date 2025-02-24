@@ -25,6 +25,7 @@ export default function FilterSidebar({
         setSelectedThemes([]);
         setSelectedActivities([]);
         setSelectedVehicles([]);
+        selectedFeatures([]);
     };
 
     const handleApply = () => {
