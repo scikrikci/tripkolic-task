@@ -2,30 +2,68 @@
 
 import { useState } from 'react';
 import { X } from 'lucide-react';
-import { filters, categories, locations } from '@/lib/data';
+import { filters, categories } from '@/lib/data';
 import FilterSection from './FilterSection';
 
-export default function FilterSidebar({
-    isMobile,
-    onClose,
-    onApply
-}) {
-    const [isOpenDropdown, setIsOpenDropdown] = useState(false);
-    const [selectedOptionLocation, setSelectedOptionLocation] = useState('All');
-    const [selectedCategory, setSelectedCategory] = useState('all');
-    const [priceRange, setPriceRange] = useState([0, 1000]);
-    const [selectedThemes, setSelectedThemes] = useState([]);
-    const [selectedActivities, setSelectedActivities] = useState([]);
-    const [selectedVehicles, setSelectedVehicles] = useState([]);
-    const [selectedFeatures, setSelectedFeatures] = useState([]);
+// Initial filter state'leri için sabitler
+const INITIAL_FILTERS = {
+    category: 'all',
+    priceRange: [0, 1000],
+    themes: [],
+    activities: [],
+    vehicles: [],
+    features: [],
+};
+
+export default function FilterSidebar({ isMobile, onClose, onApply }) {
+    // State'leri tek bir nesnede toplamak yerine ayrı tutuyoruz (daha okunabilir)
+    const [selectedCategory, setSelectedCategory] = useState(INITIAL_FILTERS.category);
+    const [priceRange, setPriceRange] = useState(INITIAL_FILTERS.priceRange);
+    const [selectedThemes, setSelectedThemes] = useState(INITIAL_FILTERS.themes);
+    const [selectedActivities, setSelectedActivities] = useState(INITIAL_FILTERS.activities);
+    const [selectedVehicles, setSelectedVehicles] = useState(INITIAL_FILTERS.vehicles);
+    const [selectedFeatures, setSelectedFeatures] = useState(INITIAL_FILTERS.features);
+
+    // Filtre bölümleri için konfigürasyon
+    const filterSections = [
+        {
+            title: 'Themes',
+            items: filters.theme,
+            state: selectedThemes,
+            setState: setSelectedThemes
+        },
+        {
+            title: 'Activities',
+            items: filters.activity,
+            state: selectedActivities,
+            setState: setSelectedActivities
+        },
+        {
+            title: 'Vehicles',
+            items: filters.vehicle,
+            state: selectedVehicles,
+            setState: setSelectedVehicles
+        },
+        {
+            title: 'Features',
+            items: filters.features,
+            state: selectedFeatures,
+            setState: setSelectedFeatures
+        }
+    ];
 
     const handleReset = () => {
-        setSelectedCategory('all');
-        setPriceRange([0, 1000]);
-        setSelectedThemes([]);
-        setSelectedActivities([]);
-        setSelectedVehicles([]);
-        selectedFeatures([]);
+        // Tüm state'leri başlangıç değerlerine sıfırla
+        setSelectedCategory(INITIAL_FILTERS.category);
+        setPriceRange(INITIAL_FILTERS.priceRange);
+        setSelectedThemes(INITIAL_FILTERS.themes);
+        setSelectedActivities(INITIAL_FILTERS.activities);
+        setSelectedVehicles(INITIAL_FILTERS.vehicles);
+        setSelectedFeatures(INITIAL_FILTERS.features);
+
+        // Sıfırlanmış değerleri hemen uygula
+        onApply(INITIAL_FILTERS);
+        isMobile && onClose?.();
     };
 
     const handleApply = () => {
@@ -37,18 +75,21 @@ export default function FilterSidebar({
             vehicles: selectedVehicles,
             features: selectedFeatures
         });
-        if (isMobile && onClose) onClose();
+        isMobile && onClose?.();
     };
 
-    const handleOptionClickDropDown = (option) => {
-        setSelectedOptionLocation(option);
-        setIsOpenDropdown(false);
+    const handlePriceChange = (value) => {
+        setPriceRange([0, parseInt(value)]);
     };
 
     return (
         <>
             {isMobile && (
-                <div className="fixed inset-0 bg-black/50 z-50" onClick={onClose} />
+                <div
+                    className="fixed inset-0 bg-black/50 z-50"
+                    onClick={onClose}
+                    role="presentation"
+                />
             )}
 
             <div className={`bg-white ${isMobile ?
@@ -56,117 +97,84 @@ export default function FilterSidebar({
                 'h-full overflow-y-auto p-6'}`}
             >
                 {isMobile && (
-                    <div className="flex justify-between items-center mb-6">
+                    <header className="flex justify-between items-center mb-6">
                         <h2 className="text-2xl font-semibold">Filters</h2>
-                        <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-full">
+                        <button
+                            onClick={onClose}
+                            className="p-2 hover:bg-gray-100 rounded-full"
+                            aria-label="Close filters"
+                        >
                             <X className="h-6 w-6" />
                         </button>
-                    </div>
+                    </header>
                 )}
 
                 <div className="space-y-8">
-                    {/* <div className="relative inline-block text-left w-full space-y-3 z-10">
-                        <button
-                            onClick={() => setIsOpenDropdown(!isOpenDropdown)}
-                            className="inline-flex justify-center w-full rounded-md border border-gray-300 p-2 bg-gray-50 text-gray-700 shadow-sm hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-gray-100"
-                        >
-                            <span className='text-primary-600 font-bold mr-1'>Locations</span>
-                            {selectedOptionLocation === 'Locations' ? ' ' : ': ' + selectedOptionLocation}
-                        </button>
-                        {isOpenDropdown && (
-                            <div
-                                className="origin-top-right absolute right-0 w-full rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none"
-                                style={{ width: '100%' }}
-                            >
-                                <div className="py-1">
-                                    {locations.map((location) => (
-                                        <a
-                                            href="#"
-                                            key={location.id}
-                                            onClick={() => handleOptionClickDropDown(location.name)}
-                                            className="text-gray-700 block px-4 py-2 text-sm hover:bg-gray-100"
-                                        >
-                                            {location.name}
-                                        </a>
-                                    ))}
-                                </div>
-                            </div>
-                        )}
-                    </div> */}
-
+                    {/* Categories Section */}
                     <FilterSection title="Categories">
-                        {categories.map(category => (
+                        {categories.map(({ id, label }) => (
                             <button
-                                key={category.id}
-                                onClick={() => setSelectedCategory(category.id)}
-                                className={`w-full text-left px-4 py-2 rounded-md text-sm ${selectedCategory === category.id
-                                    ? 'bg-orange-300 text-white'
-                                    : 'hover:bg-gray-100'
-                                    }`}
+                                key={id}
+                                onClick={() => setSelectedCategory(id)}
+                                className={`w-full text-left px-4 py-2 rounded-md text-sm transition-colors
+                  ${selectedCategory === id
+                                        ? 'bg-primary-500 text-white'
+                                        : 'hover:bg-gray-100'}`}
                             >
-                                {category.label}
+                                {label}
                             </button>
                         ))}
                     </FilterSection>
 
+                    {/* Price Range Section */}
                     <FilterSection title="Price Range">
-                        <input
-                            type="range"
-                            min="0"
-                            max="1000"
-                            value={priceRange[1]}
-                            onChange={e => setPriceRange([0, parseInt(e.target.value)])}
-                            className="w-full mt-2"
-                        />
-                        <div className="flex justify-between text-sm text-gray-600 mt-1">
-                            <span>${priceRange[0]}</span>
-                            <span>${priceRange[1]}</span>
+                        <div className="space-y-4">
+                            <input
+                                type="range"
+                                min="0"
+                                max="1000"
+                                value={priceRange[1]}
+                                onChange={(e) => handlePriceChange(e.target.value)}
+                                className="w-full mt-2"
+                                aria-label="Price range slider"
+                            />
+                            <div className="flex justify-between text-sm text-gray-600">
+                                <span>${priceRange[0]}</span>
+                                <span>${priceRange[1]}</span>
+                            </div>
                         </div>
                     </FilterSection>
 
-                    <FilterSection
-                        title="Themes"
-                        items={filters.theme}
-                        selectedItems={selectedThemes}
-                        onToggle={setSelectedThemes}
-                    />
+                    {/* Dinamik Filtre Bölümleri */}
+                    {filterSections.map(({ title, items, state, setState }) => (
+                        <FilterSection
+                            key={title}
+                            title={title}
+                            items={items}
+                            selectedItems={state}
+                            onToggle={setState}
+                        />
+                    ))}
 
-                    <FilterSection
-                        title="Activities"
-                        items={filters.activity}
-                        selectedItems={selectedActivities}
-                        onToggle={setSelectedActivities}
-                    />
-
-                    <FilterSection
-                        title="Vehicles"
-                        items={filters.vehicle}
-                        selectedItems={selectedVehicles}
-                        onToggle={setSelectedVehicles}
-                    />
-                    <FilterSection
-                        title="Features"
-                        items={filters.features}
-                        selectedItems={selectedFeatures}
-                        onToggle={setSelectedFeatures}
-                    />
-
+                    {/* Action Butonları */}
                     <div className="flex gap-4 pt-6">
                         <button
                             onClick={handleReset}
-                            className="flex-1 border border-gray-300 py-2 rounded-lg hover:bg-gray-50"
+                            className="flex-1 border border-gray-300 py-2 rounded-lg 
+                hover:bg-gray-50 transition-colors"
                         >
                             Reset
                         </button>
                         <button
                             onClick={handleApply}
-                            className="flex-1 bg-orange-400 text-white py-2 rounded-lg hover:bg-orange-500"
+                            className="flex-1 bg-primary-500 text-white py-2 rounded-lg
+                hover:bg-primary-600 transition-colors"
                         >
                             Search
                         </button>
                     </div>
-                </div >
-            </div >
+                </div>
+            </div>
         </>
     );
 }
