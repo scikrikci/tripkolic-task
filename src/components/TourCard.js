@@ -59,7 +59,7 @@ export default function TourCard({ tour }) {
                 </div>
 
                 {discount > 0 && (
-                    <div className="absolute top-2 left-2 bg-primary-500 text-white px-2 py-1 rounded-md text-sm font-semibold">
+                    <div className="absolute top-2 left-2 bg-white text-primary-500 px-2 py-1 rounded-md text-sm font-semibold">
                         {discount}% OFF
                     </div>
                 )}
