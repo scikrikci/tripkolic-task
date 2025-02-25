@@ -49,7 +49,7 @@ export default function TourCard({ tour }) {
                 />
                 <div
                     onClick={handleAddToFavorites}
-                    className={`absolute top-5 right-5 p-2 rounded-lg cursor-pointer hover:scale-[1.08] active:scale-[0.98] transition-transform delay ${isFavorite ? 'bg-red-500 hover:bg-red-600' : 'bg-white hover:bg-slate-100'
+                    className={`absolute top-5 right-5 p-2 rounded-lg cursor-pointer hover:scale-[1.08] active:scale-[0.98] transition-transform delay ${isFavorite ? 'bg-primary-500 hover:bg-primary-600' : 'bg-white hover:bg-slate-100'
                         }`}
                 >
                     <Heart className={`size-5 ${isFavorite ? 'text-white' : 'text-slate-600'}`} />
@@ -59,7 +59,7 @@ export default function TourCard({ tour }) {
                 </div>
 
                 {discount > 0 && (
-                    <div className="absolute top-2 left-2 bg-red-500 text-white px-2 py-1 rounded-md text-sm font-semibold">
+                    <div className="absolute top-2 left-2 bg-primary-500 text-white px-2 py-1 rounded-md text-sm font-semibold">
                         {discount}% OFF
                     </div>
                 )}
